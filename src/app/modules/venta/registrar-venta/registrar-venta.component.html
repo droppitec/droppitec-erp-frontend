@@ -28,7 +28,7 @@
 
           <!-- Botón de 'Nuevo producto' -->
           <div class="col-sm-12 col-xl-3">
-            <button mat-stroked-button color="warn" class="btn round new-product-btn" (click)="registrarProducto()" [appRole]="['Administrador', 'Encargado']">
+            <button mat-stroked-button color="primary" class="btn round new-product-btn" (click)="registrarProducto()" [appRole]="['Administrador', 'Encargado']">
               <mat-icon>add</mat-icon>Nuevo producto
             </button>
           </div>
@@ -211,7 +211,7 @@
               <app-error-messages [control]="txCliente"></app-error-messages>
             </div>
             <div class="col-3">
-              <button mat-stroked-button color="warn" class="btn round new-client-btn" (click)="registrarCliente()">
+              <button mat-stroked-button color="primary" class="btn round new-client-btn" (click)="registrarCliente()">
                 <mat-icon>add</mat-icon> Nuevo
               </button>
             </div>

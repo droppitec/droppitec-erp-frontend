@@ -83,7 +83,7 @@
               <div mat-dialog-actions>
                 <div class="row text-right">
                   <div class="col d-flex justify-content-end">
-                    <button mat-button color="warn" class="btn round" (click)="dialogoComentarioRef.close()" id="btnLimpiarFiltro">Cancelar</button>
+                    <button mat-button color="primary" class="btn round" (click)="dialogoComentarioRef.close()" id="btnLimpiarFiltro">Cancelar</button>
                     <button mat-raised-button color="primary" class="btn round" (click)="guardarComentario()" id="btnBuscar2">Guardar</button>
                   </div>
                 </div>
@@ -109,7 +109,7 @@
   </div>
 
   <!-- Implementación de Mat-Tab-Group -->
-  <mat-tab-group mat-align-tabs="#e15b35" color="warn" [hidden]="isSearchingLicencias && isSearchingAsistencias">
+  <mat-tab-group mat-align-tabs="#2563eb" color="primary" [hidden]="isSearchingLicencias && isSearchingAsistencias">
     <!-- Pestaña de asistencias -->
     <mat-tab label="Asistencias">
       <mat-card [hidden]="isSearchingAsistencias">

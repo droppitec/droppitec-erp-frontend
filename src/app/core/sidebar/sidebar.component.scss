@@ -57,7 +57,7 @@ a {
   list-style: none;
   padding-left: 0;
   margin-bottom: 30px;
-  color: #e15b35;
+  color: #2563eb;
 }
 
 .menu-link {
@@ -119,7 +119,7 @@ a {
 
 .activo {
   font-weight: bold;
-  box-shadow: inset 4px 0 0 #e15b35;
+  box-shadow: inset 4px 0 0 #2563eb;
 }
 
 .subMenuActivo {
@@ -185,5 +185,5 @@ a {
 }
 
 ::ng-deep .mat-list-item-content {
-  color: #e15b35 !important;
+  color: #2563eb !important;
 }
