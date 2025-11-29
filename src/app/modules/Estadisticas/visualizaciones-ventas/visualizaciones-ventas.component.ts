@@ -1,19 +1,21 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import {FormBuilder, FormControl, FormGroup} from '@angular/forms';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import {VentasService} from "../../../services/ventas.services";
 import {UsuariosService} from "../../../services/usuarios.service";
 import {FiltrosEmpleados} from "../../../models/comandos/FiltrosEmpleados.comando";
 import {Subject} from "rxjs";
 import {ProductosService} from "../../../services/productos.service";
 import {ThemeCalidoService} from "../../../services/theme.service";
+import { Chart, ChartOptions, registerables } from 'chart.js';
+
+Chart.register(...registerables);
 
 @Component({
   selector: 'app-visualizaciones-ventas',
   templateUrl: './visualizaciones-ventas.component.html',
   styleUrls: ['./visualizaciones-ventas.component.scss'],
 })
-export class VisualizacionesVentasComponent implements OnInit {
+export class VisualizacionesVentasComponent implements OnInit, OnDestroy {
   filtersForm: FormGroup;
   public darkMode: boolean = false;
   public maxDate: Date;
@@ -22,23 +24,40 @@ export class VisualizacionesVentasComponent implements OnInit {
   paymentMethods: string[] = [];
   categories: string[] = [];
   employees: string[] = [];
-  grafanaUrls: {
-    formaPago: SafeResourceUrl;
-    fechaHora: SafeResourceUrl;
-    categoria: SafeResourceUrl;
-    empleados: SafeResourceUrl;
-    clientes: SafeResourceUrl;
-  } = {
-    formaPago: '',
-    fechaHora: '',
-    categoria: '',
-    empleados: '',
-    clientes: '' ,
+
+  // Datos hardcodeados para los gráficos
+  private datosHardcodeados = {
+    formaPago: {
+      labels: ['Efectivo', 'Tarjeta de Débito', 'Tarjeta de Crédito', 'Transferencia', 'Mercado Pago'],
+      data: [45000, 32000, 28000, 15000, 12000]
+    },
+    categoria: {
+      labels: ['Electrónica', 'Ropa', 'Hogar', 'Deportes', 'Libros', 'Juguetes'],
+      data: [55000, 42000, 38000, 25000, 18000, 15000]
+    },
+    fechaHora: {
+      labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
+      data: [5000, 3000, 15000, 25000, 22000, 18000]
+    },
+    empleados: {
+      labels: ['Juan Pérez', 'María García', 'Carlos López', 'Ana Martínez', 'Pedro Rodríguez'],
+      data: [35000, 32000, 28000, 25000, 20000]
+    },
+    clientes: {
+      labels: ['Cliente A', 'Cliente B', 'Cliente C', 'Cliente D', 'Cliente E', 'Cliente F'],
+      data: [28000, 25000, 22000, 20000, 18000, 15000]
+    }
   };
+
+  // Configuración de gráficos
+  public chartFormaPago: any;
+  public chartCategoria: any;
+  public chartFechaHora: any;
+  public chartEmpleados: any;
+  public chartClientes: any;
 
   constructor(
     private fb: FormBuilder,
-    private sanitizer: DomSanitizer,
     private ventasService: VentasService,
     private usuariosService: UsuariosService,
     private productosService: ProductosService,
@@ -56,6 +75,10 @@ export class VisualizacionesVentasComponent implements OnInit {
   ngOnInit(): void {
     this.obtenerInformacionTema();
     this.buscarDatosCombo();
+    this.themeService.darkMode$.subscribe((isDarkMode) => {
+      this.darkMode = isDarkMode;
+      this.actualizarGraficos();
+    });
   }
 
   obtenerInformacionTema() {
@@ -91,82 +114,278 @@ export class VisualizacionesVentasComponent implements OnInit {
       }
     });
 
-    // Suscribirse al Subject para ejecutar updateGrafanaUrls() cuando todas las suscripciones se completen
+    // Suscribirse al Subject para ejecutar actualizarGraficos() cuando todas las suscripciones se completen
     this.dataLoaded$.subscribe(() => {
-      this.updateGrafanaUrls();
-      this.filtersForm.valueChanges.subscribe(() => this.updateGrafanaUrls());
+      this.crearGraficos();
+      this.filtersForm.valueChanges.subscribe(() => this.actualizarGraficos());
     });
   }
 
-  private formatToUnix(date: Date | null, isEndDate: boolean = false): number {
-    if (!date) return 0;
-    const adjustedDate = new Date(date);
-    if (isEndDate) {
-      adjustedDate.setHours(23, 59, 59, 999); // Establece la hora a 23:59:59.999
+  private getChartOptions(type: 'bar' | 'line' | 'pie' | 'doughnut'): ChartOptions {
+    const textColor = this.darkMode ? 'rgb(255,255,255)' : 'rgb(74,74,74)';
+    const gridColor = this.darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+
+    const baseOptions: ChartOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+          labels: {
+            color: textColor,
+            font: {
+              size: 12
+            }
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: (context) => {
+              const value = Number(context.raw);
+              const formattedValue = new Intl.NumberFormat('es-AR', {
+                style: 'currency',
+                currency: 'ARS',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+              }).format(value);
+              return `${context.label}: ${formattedValue}`;
+            }
+          }
+        }
+      }
+    };
+
+    if (type === 'bar' || type === 'line') {
+      return {
+        ...baseOptions,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              color: textColor,
+              font: { size: 10 },
+              callback: (value) => {
+                const numericValue = Number(value);
+                return new Intl.NumberFormat('es-AR', {
+                  style: 'currency',
+                  currency: 'ARS',
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0,
+                }).format(numericValue);
+              }
+            },
+            grid: {
+              color: gridColor,
+              lineWidth: 0.5
+            }
+          },
+          x: {
+            ticks: {
+              color: textColor,
+              font: { size: 10 }
+            },
+            grid: {
+              color: gridColor,
+              lineWidth: 0.5
+            }
+          }
+        }
+      };
     }
-    return adjustedDate.getTime();
+
+    return baseOptions;
   }
 
-  private formatToString(date: Date | null): string {
-    if (!date) return '';
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+  private crearGraficos(): void {
+    setTimeout(() => {
+      this.crearGraficoFormaPago();
+      this.crearGraficoCategoria();
+      this.crearGraficoFechaHora();
+      this.crearGraficoEmpleados();
+      this.crearGraficoClientes();
+    }, 100);
   }
 
-  updateGrafanaUrls(): void {
-    const { start_date, end_date, payment_method, var_category, employee_name } = this.filtersForm.value;
+  private crearGraficoFormaPago(): void {
+    const canvas = document.getElementById('chartFormaPago') as HTMLCanvasElement;
+    if (!canvas) return;
 
-    const startDateUnix = this.formatToUnix(start_date) || 1728259200000;
-    const endDateUnix = this.formatToUnix(end_date, true) || 1733356800000;
-
-    const formattedStartDate = this.formatToString(start_date) || '2024-01-01';
-    const formattedEndDate = this.formatToString(end_date) || '2026-01-01';
-
-    const baseGrafanaUrl = 'https://grafanae-production.up.railway.app/d-solo/cec3ghf2dxrswc/new-dashboard?';
-
-    const theme: string = this.darkMode ? 'dark' : 'light';
-
-    let employeeFilter = '';
-    if (employee_name === 'Todos') {
-      employeeFilter = this.employees.map((name) => encodeURIComponent(name)).join(',');
-    } else if (employee_name) {
-      employeeFilter = encodeURIComponent(employee_name);
+    if (this.chartFormaPago) {
+      this.chartFormaPago.destroy();
     }
 
-    const safeUrl = (url: string) => this.sanitizer.bypassSecurityTrustResourceUrl(url);
+    this.chartFormaPago = new Chart(canvas, {
+      type: 'doughnut',
+      data: {
+        labels: this.datosHardcodeados.formaPago.labels,
+        datasets: [{
+          data: this.datosHardcodeados.formaPago.data,
+          backgroundColor: [
+            'rgba(246,121,86,0.8)',
+            'rgba(54,162,235,0.8)',
+            'rgba(255,206,86,0.8)',
+            'rgba(75,192,192,0.8)',
+            'rgba(153,102,255,0.8)'
+          ],
+          borderColor: [
+            'rgba(246,121,86,1)',
+            'rgba(54,162,235,1)',
+            'rgba(255,206,86,1)',
+            'rgba(75,192,192,1)',
+            'rgba(153,102,255,1)'
+          ],
+          borderWidth: 2
+        }]
+      },
+      options: this.getChartOptions('doughnut')
+    });
+  }
 
-    this.grafanaUrls.formaPago = safeUrl(
-      `${baseGrafanaUrl}?&from=${startDateUnix}&to=${endDateUnix}&timezone=browser&var-start_date=${formattedStartDate}&var-end_date=${formattedEndDate}&var-payment_method=${payment_method}&var-var_category=${var_category}&var-Empleado=${employeeFilter}&orgId=1&panelId=2&theme=${theme}`
-    );
+  private crearGraficoCategoria(): void {
+    const canvas = document.getElementById('chartCategoria') as HTMLCanvasElement;
+    if (!canvas) return;
 
-    this.grafanaUrls.fechaHora = safeUrl(
-      `${baseGrafanaUrl}?&from=${startDateUnix}&to=${endDateUnix}&timezone=browser&var-start_date=${formattedStartDate}&var-end_date=${formattedEndDate}&var-Empleado=${employeeFilter}&var-payment_method=${payment_method}&var-var_category=${var_category}&orgId=1&panelId=4&theme=${theme}`
-    );
+    if (this.chartCategoria) {
+      this.chartCategoria.destroy();
+    }
 
-    this.grafanaUrls.categoria = safeUrl(
-      `${baseGrafanaUrl}?&from=${startDateUnix}&to=${endDateUnix}&timezone=browser&var-start_date=${formattedStartDate}&var-end_date=${formattedEndDate}&var-payment_method=${payment_method}&var-var_category=${var_category}&var-Empleado=${employeeFilter}&orgId=1&panelId=3&theme=${theme}`
-    );
+    this.chartCategoria = new Chart(canvas, {
+      type: 'bar',
+      data: {
+        labels: this.datosHardcodeados.categoria.labels,
+        datasets: [{
+          label: 'Ventas',
+          data: this.datosHardcodeados.categoria.data,
+          backgroundColor: 'rgba(246,121,86,0.6)',
+          borderColor: 'rgba(246,121,86,1)',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        ...this.getChartOptions('bar'),
+        indexAxis: 'y'
+      }
+    });
+  }
 
-    this.grafanaUrls.empleados = safeUrl(
-      `${baseGrafanaUrl}?&from=${startDateUnix}&to=${endDateUnix}&timezone=browser&var-start_date=${formattedStartDate}&var-end_date=${formattedEndDate}&var-Empleado=${employeeFilter}&var-var_category=${var_category}&var-payment_method=${payment_method}&orgId=1&panelId=1&theme=${theme}`
-    );
+  private crearGraficoFechaHora(): void {
+    const canvas = document.getElementById('chartFechaHora') as HTMLCanvasElement;
+    if (!canvas) return;
 
-    this.grafanaUrls.clientes = safeUrl(
-      `${baseGrafanaUrl}?&from=${startDateUnix}&to=${endDateUnix}&timezone=browser&var-start_date=${formattedStartDate}&var-end_date=${formattedEndDate}&var-Empleado=${employeeFilter}&var-var_category=${var_category}&var-payment_method=${payment_method}&orgId=1&panelId=5&theme=${theme}`
-    );
+    if (this.chartFechaHora) {
+      this.chartFechaHora.destroy();
+    }
+
+    this.chartFechaHora = new Chart(canvas, {
+      type: 'line',
+      data: {
+        labels: this.datosHardcodeados.fechaHora.labels,
+        datasets: [{
+          label: 'Ventas',
+          data: this.datosHardcodeados.fechaHora.data,
+          borderColor: 'rgba(54,162,235,1)',
+          backgroundColor: 'rgba(54,162,235,0.2)',
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4,
+          pointRadius: 5,
+          pointHoverRadius: 7
+        }]
+      },
+      options: this.getChartOptions('line')
+    });
+  }
+
+  private crearGraficoEmpleados(): void {
+    const canvas = document.getElementById('chartEmpleados') as HTMLCanvasElement;
+    if (!canvas) return;
+
+    if (this.chartEmpleados) {
+      this.chartEmpleados.destroy();
+    }
+
+    this.chartEmpleados = new Chart(canvas, {
+      type: 'bar',
+      data: {
+        labels: this.datosHardcodeados.empleados.labels,
+        datasets: [{
+          label: 'Ventas',
+          data: this.datosHardcodeados.empleados.data,
+          backgroundColor: 'rgba(75,192,192,0.6)',
+          borderColor: 'rgba(75,192,192,1)',
+          borderWidth: 2
+        }]
+      },
+      options: this.getChartOptions('bar')
+    });
+  }
+
+  private crearGraficoClientes(): void {
+    const canvas = document.getElementById('chartClientes') as HTMLCanvasElement;
+    if (!canvas) return;
+
+    if (this.chartClientes) {
+      this.chartClientes.destroy();
+    }
+
+    this.chartClientes = new Chart(canvas, {
+      type: 'bar',
+      data: {
+        labels: this.datosHardcodeados.clientes.labels,
+        datasets: [{
+          label: 'Ventas',
+          data: this.datosHardcodeados.clientes.data,
+          backgroundColor: 'rgba(153,102,255,0.6)',
+          borderColor: 'rgba(153,102,255,1)',
+          borderWidth: 2
+        }]
+      },
+      options: this.getChartOptions('bar')
+    });
+  }
+
+  private actualizarGraficos(): void {
+    if (this.chartFormaPago) {
+      this.chartFormaPago.options = this.getChartOptions('doughnut');
+      this.chartFormaPago.update();
+    }
+    if (this.chartCategoria) {
+      this.chartCategoria.options = this.getChartOptions('bar');
+      this.chartCategoria.update();
+    }
+    if (this.chartFechaHora) {
+      this.chartFechaHora.options = this.getChartOptions('line');
+      this.chartFechaHora.update();
+    }
+    if (this.chartEmpleados) {
+      this.chartEmpleados.options = this.getChartOptions('bar');
+      this.chartEmpleados.update();
+    }
+    if (this.chartClientes) {
+      this.chartClientes.options = this.getChartOptions('bar');
+      this.chartClientes.update();
+    }
   }
 
   limpiarFiltros() {
-    this.filtersForm.reset(); // Resetea el formulario
+    this.filtersForm.reset();
     this.filtersForm.patchValue({
-      start_date: null, // O un valor predeterminado
-      end_date: null, // O un valor predeterminado
-      payment_method: '', // "Todos" o vacío
-      var_category: '', // "Todas" o vacío
-      employee_name: '', // "Todos" o vacío
+      start_date: null,
+      end_date: null,
+      payment_method: '',
+      var_category: '',
+      employee_name: '',
     });
+    // Los gráficos se actualizan automáticamente por valueChanges
+  }
+
+  ngOnDestroy(): void {
+    if (this.chartFormaPago) this.chartFormaPago.destroy();
+    if (this.chartCategoria) this.chartCategoria.destroy();
+    if (this.chartFechaHora) this.chartFechaHora.destroy();
+    if (this.chartEmpleados) this.chartEmpleados.destroy();
+    if (this.chartClientes) this.chartClientes.destroy();
   }
 
   get txFechaDesde(): FormControl {

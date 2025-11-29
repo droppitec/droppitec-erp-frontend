@@ -86,7 +86,9 @@
             <div class="chart-card chart-full">
               <h3 class="chart-title"><span class="icon">📊</span> Ventas totales por forma de pago
               </h3>
-              <iframe [src]="grafanaUrls.formaPago" class="chart-frame"></iframe>
+              <div class="chart-container">
+                <canvas id="chartFormaPago"></canvas>
+              </div>
             </div>
           </div>
         </div>
@@ -94,25 +96,33 @@
           <div class="col-md-6 mb-4">
             <div class="chart-card">
               <h3 class="chart-title"><span class="icon">📈</span> Ranking de ventas por categoría</h3>
-              <iframe [src]="grafanaUrls.categoria" class="chart-frame"></iframe>
+              <div class="chart-container">
+                <canvas id="chartCategoria"></canvas>
+              </div>
             </div>
           </div>
           <div class="col-md-6 mb-4">
             <div class="chart-card">
               <h3 class="chart-title"><span class="icon">⏰</span> Ventas por fecha y hora</h3>
-              <iframe [src]="grafanaUrls.fechaHora" class="chart-frame"></iframe>
+              <div class="chart-container">
+                <canvas id="chartFechaHora"></canvas>
+              </div>
             </div>
           </div>
           <div class="col-md-6 mb-4">
             <div class="chart-card chart-full">
               <h3 class="chart-title"><span class="icon">👤</span> Ventas por empleados</h3>
-              <iframe [src]="grafanaUrls.empleados" class="chart-frame"></iframe>
+              <div class="chart-container">
+                <canvas id="chartEmpleados"></canvas>
+              </div>
             </div>
           </div>
           <div class="col-md-6 mb-4">
             <div class="chart-card chart-full">
               <h3 class="chart-title"><span class="icon">🙍‍♂️</span> Ventas por clientes</h3>
-              <iframe [src]="grafanaUrls.clientes" class="chart-frame"></iframe>
+              <div class="chart-container">
+                <canvas id="chartClientes"></canvas>
+              </div>
             </div>
           </div>
         </div>
