@@ -16,8 +16,6 @@ export class ConsultarConfiguracionesComponent implements OnInit {
   public form: FormGroup;
   public esSuperusuario: boolean = false;
   public configuracion: Configuracion = new Configuracion();
-  public logoUrl: string | ArrayBuffer | null = null;
-  private selectedFile: File | null = null;
   public isLoading = false;
   public isSearchingConfiguration: boolean = false;
 
@@ -48,7 +46,6 @@ export class ConsultarConfiguracionesComponent implements OnInit {
       cuit: [''],
       fechaInicioActividades: [''],
       condicionIva: [''],
-      logo: [null],
       contrasenaInstagram: [''],
       usuarioInstagram: [''],
       facturacionAutomatica: [''],
@@ -61,7 +58,6 @@ export class ConsultarConfiguracionesComponent implements OnInit {
     this.configuracionesService.consultarConfiguraciones().subscribe({
       next: (configuracion) => {
         this.configuracion = configuracion;
-        this.logoUrl = configuracion.logo;
 
         this.form.patchValue({
           idUsuario: configuracion.idUsuario,
@@ -76,7 +72,6 @@ export class ConsultarConfiguracionesComponent implements OnInit {
           fechaInicioActividades: configuracion.fechaInicioActividades,
           condicionIva: configuracion.condicionIva,
           contrasenaInstagram: configuracion.contrasenaInstagram,
-          logo: configuracion.logo,
           usuarioInstagram: configuracion.usuarioInstagram,
           facturacionAutomatica: configuracion.facturacionAutomatica,
           txMontoConsumidorFinal: configuracion.montoConsumidorFinal
@@ -91,68 +86,16 @@ export class ConsultarConfiguracionesComponent implements OnInit {
     });
   }
 
-  private validateImage(file: File): boolean {
-    const validTypes = ['image/png', 'image/jpeg'];
-    const maxSize = 10 * 1024 * 1024; // 10MB
-
-    if (!validTypes.includes(file.type)) {
-      this.notificacionService.openSnackBarError('El tipo de archivo no es válido. Solo se permiten archivos PNG o JPG.');
-      return false;
-    }
-
-    if (file.size > maxSize) {
-      this.notificacionService.openSnackBarError('El tamaño del archivo es demasiado grande. El tamaño máximo permitido es de 10MB.');
-      return false;
-    }
-
-    return true;
-  }
-
-  private handleFileInput(file: File) {
-    if (!this.validateImage(file)) {
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      this.logoUrl = reader.result;
-    };
-    reader.readAsDataURL(file);
-  }
-
-  onFileSelected(event: Event) {
-    const fileInput = event.target as HTMLInputElement;
-    if (fileInput.files && fileInput.files.length > 0) {
-      this.selectedFile = fileInput.files[0];
-      this.handleFileInput(this.selectedFile);
-    }
-  }
 
   // Método que se ejecuta al dar click al botón de guardar
   public guardarConfiguracion() {
     if (this.form.valid) {
-      this.convertirLogoABase64((logoBase64) => {
-        const configuracion = this.crearConfiguracionDesdeFormulario(logoBase64);
-        this.actualizarConfiguracion(configuracion);
-      });
+      const configuracion = this.crearConfiguracionDesdeFormulario();
+      this.actualizarConfiguracion(configuracion);
     }
   }
 
-  // Método que convierte el logo a base64 para guardarlo así en la tabla configuración
-  private convertirLogoABase64(callback: (logoBase64: string | null) => void) {
-    if (!this.selectedFile) {
-      callback(null);
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      callback(reader.result as string);
-    };
-    reader.readAsDataURL(this.selectedFile);
-  }
-
-  private crearConfiguracionDesdeFormulario(logoBase64: string | null): Configuracion {
+  private crearConfiguracionDesdeFormulario(): Configuracion {
     return new Configuracion(
       this.configuracion.id,
       this.configuracion.idUsuario,
@@ -160,7 +103,7 @@ export class ConsultarConfiguracionesComponent implements OnInit {
       this.cuit.value,
       this.fechaInicioActividades.value,
       this.condicionIva.value,
-      logoBase64,
+      this.configuracion.logo, // Mantener el logo existente
       this.contrasenaInstagram.value,
       this.usuarioInstagram.value,
       this.configuracion.usuario = new Usuario(),
@@ -200,28 +143,6 @@ export class ConsultarConfiguracionesComponent implements OnInit {
       });
   }
 
-  onDragOver(event: DragEvent): void {
-    event.preventDefault();
-  }
-
-  onDrop(event: DragEvent): void {
-    event.preventDefault();
-
-    if (event.dataTransfer?.files) {
-      const file = event.dataTransfer.files[0];
-      this.previewImage(file);
-    }
-  }
-
-  previewImage(file: File): void {
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      this.logoUrl = reader.result;
-    };
-
-    reader.readAsDataURL(file);
-  }
 
 
   // Getters
@@ -269,10 +190,6 @@ export class ConsultarConfiguracionesComponent implements OnInit {
     return this.form.get('condicionIva') as FormControl;
   }
 
-  get logo(): FormControl {
-    return this.form.get('logo') as FormControl;
-  }
-
   get contrasenaInstagram(): FormControl {
     return this.form.get('contrasenaInstagram') as FormControl;
   }
@@ -290,3 +207,4 @@ export class ConsultarConfiguracionesComponent implements OnInit {
   }
 
 }
+
