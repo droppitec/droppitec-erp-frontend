@@ -3,10 +3,12 @@ import {FormBuilder, FormControl, FormGroup} from '@angular/forms';
 import {VentasService} from "../../../services/ventas.services";
 import {UsuariosService} from "../../../services/usuarios.service";
 import {FiltrosEmpleados} from "../../../models/comandos/FiltrosEmpleados.comando";
-import {Subject} from "rxjs";
+import {Subject, forkJoin} from "rxjs";
 import {ProductosService} from "../../../services/productos.service";
 import {ThemeCalidoService} from "../../../services/theme.service";
 import { Chart, ChartOptions, registerables } from 'chart.js';
+import {FiltrosEstadisticasVentas} from "../../../models/comandos/FiltrosEstadisticasVentas.comando";
+import {Usuario} from "../../../models/usuario.model";
 
 Chart.register(...registerables);
 
@@ -24,30 +26,8 @@ export class VisualizacionesVentasComponent implements OnInit, OnDestroy {
   paymentMethods: string[] = [];
   categories: string[] = [];
   employees: string[] = [];
-
-  // Datos hardcodeados para los gráficos
-  private datosHardcodeados = {
-    formaPago: {
-      labels: ['Efectivo', 'Tarjeta de Débito', 'Tarjeta de Crédito', 'Transferencia', 'Mercado Pago'],
-      data: [45000, 32000, 28000, 15000, 12000]
-    },
-    categoria: {
-      labels: ['Electrónica', 'Ropa', 'Hogar', 'Deportes', 'Libros', 'Juguetes'],
-      data: [55000, 42000, 38000, 25000, 18000, 15000]
-    },
-    fechaHora: {
-      labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
-      data: [5000, 3000, 15000, 25000, 22000, 18000]
-    },
-    empleados: {
-      labels: ['Juan Pérez', 'María García', 'Carlos López', 'Ana Martínez', 'Pedro Rodríguez'],
-      data: [35000, 32000, 28000, 25000, 20000]
-    },
-    clientes: {
-      labels: ['Cliente A', 'Cliente B', 'Cliente C', 'Cliente D', 'Cliente E', 'Cliente F'],
-      data: [28000, 25000, 22000, 20000, 18000, 15000]
-    }
-  };
+  empleadosCompletos: Usuario[] = []; // Para mapear nombre a ID
+  public cargandoDatos: boolean = false;
 
   // Configuración de gráficos
   public chartFormaPago: any;
@@ -91,6 +71,7 @@ export class VisualizacionesVentasComponent implements OnInit, OnDestroy {
     const totalSubscriptions = 3;
 
     this.usuariosService.consultarEmpleados(new FiltrosEmpleados()).subscribe((empleados) => {
+      this.empleadosCompletos = empleados;
       this.employees = empleados.map((empleado) => empleado.nombre + ' ' + empleado.apellido);
       completedSubscriptions++;
       if (completedSubscriptions === totalSubscriptions) {
@@ -198,16 +179,67 @@ export class VisualizacionesVentasComponent implements OnInit, OnDestroy {
   }
 
   private crearGraficos(): void {
-    setTimeout(() => {
-      this.crearGraficoFormaPago();
-      this.crearGraficoCategoria();
-      this.crearGraficoFechaHora();
-      this.crearGraficoEmpleados();
-      this.crearGraficoClientes();
-    }, 100);
+    this.cargarDatosGraficos();
   }
 
-  private crearGraficoFormaPago(): void {
+  private construirFiltros(): FiltrosEstadisticasVentas {
+    const { start_date, end_date, payment_method, var_category, employee_name } = this.filtersForm.value;
+    
+    // Buscar el ID del empleado por nombre
+    let idEmpleado: number | null = null;
+    if (employee_name && employee_name !== '') {
+      const empleado = this.empleadosCompletos.find(
+        emp => (emp.nombre + ' ' + emp.apellido) === employee_name
+      );
+      idEmpleado = empleado?.id || null;
+    }
+
+    return new FiltrosEstadisticasVentas(
+      start_date || null,
+      end_date || null,
+      payment_method || '',
+      var_category || '',
+      idEmpleado
+    );
+  }
+
+  private cargarDatosGraficos(): void {
+    this.cargandoDatos = true;
+    const filtros = this.construirFiltros();
+
+    forkJoin({
+      formaPago: this.ventasService.obtenerVentasPorFormaPago(filtros),
+      categoria: this.ventasService.obtenerVentasPorCategoria(filtros),
+      hora: this.ventasService.obtenerVentasPorHora(filtros),
+      empleados: this.ventasService.obtenerVentasPorEmpleado(filtros),
+      clientes: this.ventasService.obtenerVentasPorCliente(filtros)
+    }).subscribe({
+      next: (datos) => {
+        setTimeout(() => {
+          this.crearGraficoFormaPago(datos.formaPago);
+          this.crearGraficoCategoria(datos.categoria);
+          this.crearGraficoFechaHora(datos.hora);
+          this.crearGraficoEmpleados(datos.empleados);
+          this.crearGraficoClientes(datos.clientes);
+          this.cargandoDatos = false;
+        }, 100);
+      },
+      error: (error) => {
+        console.error('Error al cargar datos de gráficos:', error);
+        this.cargandoDatos = false;
+        // En caso de error, mostrar gráficos vacíos
+        setTimeout(() => {
+          this.crearGraficoFormaPago([]);
+          this.crearGraficoCategoria([]);
+          this.crearGraficoFechaHora([]);
+          this.crearGraficoEmpleados([]);
+          this.crearGraficoClientes([]);
+        }, 100);
+      }
+    });
+  }
+
+  private crearGraficoFormaPago(datos: any[]): void {
     const canvas = document.getElementById('chartFormaPago') as HTMLCanvasElement;
     if (!canvas) return;
 
@@ -215,26 +247,20 @@ export class VisualizacionesVentasComponent implements OnInit, OnDestroy {
       this.chartFormaPago.destroy();
     }
 
+    const labels = datos.map(item => item.formaPago);
+    const values = datos.map(item => item.total);
+
+    // Generar colores dinámicamente
+    const colors = this.generarColores(datos.length);
+
     this.chartFormaPago = new Chart(canvas, {
       type: 'doughnut',
       data: {
-        labels: this.datosHardcodeados.formaPago.labels,
+        labels: labels.length > 0 ? labels : ['Sin datos'],
         datasets: [{
-          data: this.datosHardcodeados.formaPago.data,
-          backgroundColor: [
-            'rgba(246,121,86,0.8)',
-            'rgba(54,162,235,0.8)',
-            'rgba(255,206,86,0.8)',
-            'rgba(75,192,192,0.8)',
-            'rgba(153,102,255,0.8)'
-          ],
-          borderColor: [
-            'rgba(246,121,86,1)',
-            'rgba(54,162,235,1)',
-            'rgba(255,206,86,1)',
-            'rgba(75,192,192,1)',
-            'rgba(153,102,255,1)'
-          ],
+          data: values.length > 0 ? values : [0],
+          backgroundColor: colors.backgroundColor,
+          borderColor: colors.borderColor,
           borderWidth: 2
         }]
       },
@@ -242,7 +268,7 @@ export class VisualizacionesVentasComponent implements OnInit, OnDestroy {
     });
   }
 
-  private crearGraficoCategoria(): void {
+  private crearGraficoCategoria(datos: any[]): void {
     const canvas = document.getElementById('chartCategoria') as HTMLCanvasElement;
     if (!canvas) return;
 
@@ -250,13 +276,16 @@ export class VisualizacionesVentasComponent implements OnInit, OnDestroy {
       this.chartCategoria.destroy();
     }
 
+    const labels = datos.map(item => item.categoria);
+    const values = datos.map(item => item.total);
+
     this.chartCategoria = new Chart(canvas, {
       type: 'bar',
       data: {
-        labels: this.datosHardcodeados.categoria.labels,
+        labels: labels.length > 0 ? labels : ['Sin datos'],
         datasets: [{
           label: 'Ventas',
-          data: this.datosHardcodeados.categoria.data,
+          data: values.length > 0 ? values : [0],
           backgroundColor: 'rgba(246,121,86,0.6)',
           borderColor: 'rgba(246,121,86,1)',
           borderWidth: 2
@@ -269,7 +298,7 @@ export class VisualizacionesVentasComponent implements OnInit, OnDestroy {
     });
   }
 
-  private crearGraficoFechaHora(): void {
+  private crearGraficoFechaHora(datos: any[]): void {
     const canvas = document.getElementById('chartFechaHora') as HTMLCanvasElement;
     if (!canvas) return;
 
@@ -277,13 +306,23 @@ export class VisualizacionesVentasComponent implements OnInit, OnDestroy {
       this.chartFechaHora.destroy();
     }
 
+    // Ordenar por hora para mostrar correctamente
+    const datosOrdenados = [...datos].sort((a, b) => {
+      const horaA = parseInt(a.hora.split(':')[0]);
+      const horaB = parseInt(b.hora.split(':')[0]);
+      return horaA - horaB;
+    });
+
+    const labels = datosOrdenados.map(item => item.hora);
+    const values = datosOrdenados.map(item => item.total);
+
     this.chartFechaHora = new Chart(canvas, {
       type: 'line',
       data: {
-        labels: this.datosHardcodeados.fechaHora.labels,
+        labels: labels.length > 0 ? labels : ['Sin datos'],
         datasets: [{
           label: 'Ventas',
-          data: this.datosHardcodeados.fechaHora.data,
+          data: values.length > 0 ? values : [0],
           borderColor: 'rgba(54,162,235,1)',
           backgroundColor: 'rgba(54,162,235,0.2)',
           borderWidth: 3,
@@ -297,7 +336,7 @@ export class VisualizacionesVentasComponent implements OnInit, OnDestroy {
     });
   }
 
-  private crearGraficoEmpleados(): void {
+  private crearGraficoEmpleados(datos: any[]): void {
     const canvas = document.getElementById('chartEmpleados') as HTMLCanvasElement;
     if (!canvas) return;
 
@@ -305,13 +344,16 @@ export class VisualizacionesVentasComponent implements OnInit, OnDestroy {
       this.chartEmpleados.destroy();
     }
 
+    const labels = datos.map(item => item.nombreCompleto);
+    const values = datos.map(item => item.total);
+
     this.chartEmpleados = new Chart(canvas, {
       type: 'bar',
       data: {
-        labels: this.datosHardcodeados.empleados.labels,
+        labels: labels.length > 0 ? labels : ['Sin datos'],
         datasets: [{
           label: 'Ventas',
-          data: this.datosHardcodeados.empleados.data,
+          data: values.length > 0 ? values : [0],
           backgroundColor: 'rgba(75,192,192,0.6)',
           borderColor: 'rgba(75,192,192,1)',
           borderWidth: 2
@@ -321,7 +363,7 @@ export class VisualizacionesVentasComponent implements OnInit, OnDestroy {
     });
   }
 
-  private crearGraficoClientes(): void {
+  private crearGraficoClientes(datos: any[]): void {
     const canvas = document.getElementById('chartClientes') as HTMLCanvasElement;
     if (!canvas) return;
 
@@ -329,13 +371,16 @@ export class VisualizacionesVentasComponent implements OnInit, OnDestroy {
       this.chartClientes.destroy();
     }
 
+    const labels = datos.map(item => item.nombreCompleto);
+    const values = datos.map(item => item.total);
+
     this.chartClientes = new Chart(canvas, {
       type: 'bar',
       data: {
-        labels: this.datosHardcodeados.clientes.labels,
+        labels: labels.length > 0 ? labels : ['Sin datos'],
         datasets: [{
           label: 'Ventas',
-          data: this.datosHardcodeados.clientes.data,
+          data: values.length > 0 ? values : [0],
           backgroundColor: 'rgba(153,102,255,0.6)',
           borderColor: 'rgba(153,102,255,1)',
           borderWidth: 2
@@ -345,27 +390,33 @@ export class VisualizacionesVentasComponent implements OnInit, OnDestroy {
     });
   }
 
+  private generarColores(cantidad: number): { backgroundColor: string[], borderColor: string[] } {
+    const coloresBase = [
+      { bg: 'rgba(246,121,86,0.8)', border: 'rgba(246,121,86,1)' },
+      { bg: 'rgba(54,162,235,0.8)', border: 'rgba(54,162,235,1)' },
+      { bg: 'rgba(255,206,86,0.8)', border: 'rgba(255,206,86,1)' },
+      { bg: 'rgba(75,192,192,0.8)', border: 'rgba(75,192,192,1)' },
+      { bg: 'rgba(153,102,255,0.8)', border: 'rgba(153,102,255,1)' },
+      { bg: 'rgba(255,99,132,0.8)', border: 'rgba(255,99,132,1)' },
+      { bg: 'rgba(201,203,207,0.8)', border: 'rgba(201,203,207,1)' },
+      { bg: 'rgba(255,159,64,0.8)', border: 'rgba(255,159,64,1)' }
+    ];
+
+    const backgroundColor: string[] = [];
+    const borderColor: string[] = [];
+
+    for (let i = 0; i < cantidad; i++) {
+      const color = coloresBase[i % coloresBase.length];
+      backgroundColor.push(color.bg);
+      borderColor.push(color.border);
+    }
+
+    return { backgroundColor, borderColor };
+  }
+
   private actualizarGraficos(): void {
-    if (this.chartFormaPago) {
-      this.chartFormaPago.options = this.getChartOptions('doughnut');
-      this.chartFormaPago.update();
-    }
-    if (this.chartCategoria) {
-      this.chartCategoria.options = this.getChartOptions('bar');
-      this.chartCategoria.update();
-    }
-    if (this.chartFechaHora) {
-      this.chartFechaHora.options = this.getChartOptions('line');
-      this.chartFechaHora.update();
-    }
-    if (this.chartEmpleados) {
-      this.chartEmpleados.options = this.getChartOptions('bar');
-      this.chartEmpleados.update();
-    }
-    if (this.chartClientes) {
-      this.chartClientes.options = this.getChartOptions('bar');
-      this.chartClientes.update();
-    }
+    // Recargar datos cuando cambian los filtros o el tema
+    this.cargarDatosGraficos();
   }
 
   limpiarFiltros() {
