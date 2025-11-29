@@ -37,10 +37,11 @@ mat-sidenav {
 }
 
 .header-logo {
-  width: 35px;
+  width: 100px;
+  height: auto;
   transition: max-width 0.5s ease;
   margin-left: 15px;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 ul li {

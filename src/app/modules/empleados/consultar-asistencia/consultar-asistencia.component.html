@@ -6,13 +6,13 @@
         <div class="d-flex justify-content-end">
           <button
             mat-stroked-button
-            color="warn"
+            color="primary"
             class="btn round mb-3 botonR"
             (click)="registrarNuevaAsistencia()"
             [appRole]="['Encargado']"
           >Registrar nueva asistencia</button>
           <button
-            mat-stroked-button color="warn"
+            mat-stroked-button color="primary"
             class="btn round mb-3 ms-2 botonR"
             (click)="registrarNuevaLicencia()"
             [appRole]="['Encargado']"
@@ -79,7 +79,7 @@
     <mat-spinner></mat-spinner>
   </div>
 
-  <mat-tab-group mat-align-tabs="#2563eb" color="warn" [hidden]="isSearchingLicencias && isSearchingAsistencias">
+  <mat-tab-group mat-align-tabs="#2563eb" color="primary" [hidden]="isSearchingLicencias && isSearchingAsistencias">
 
     <!-- Pestaña de asistencias -->
     <mat-tab label="Asistencias">

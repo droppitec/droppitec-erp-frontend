@@ -186,8 +186,8 @@ export class VentasMensualesComponent implements OnInit {
     {
       data: [],
       label: 'Ventas',
-      backgroundColor: 'rgba(246,121,86,0.5)',
-      borderColor: 'rgba(225, 91, 53, 1)',
+      backgroundColor: 'rgba(59, 130, 246, 0.5)',
+      borderColor: 'rgba(37, 99, 235, 1)',
       borderWidth: {
         top: 3,
         right: 1,
