@@ -1,99 +1,104 @@
-<div *ngIf="!isLoading" class="row justify-content-center mt-5">
-  <div class="col-8">
-    <form [formGroup]="formLogin">
+<div *ngIf="!isLoading" class="login-container">
+  <div class="login-left">
+    <div class="form-wrapper">
+      <form [formGroup]="formLogin">
 
-      <mat-card class="mat-card">
+        <mat-card class="mat-card">
 
-        <div class="col titulo-container">
-          <h1 class="titulo">{{ existeConfiguracion ? 'Iniciar sesión' : 'Registrar usuario' }}</h1>
-        </div>
+          <div class="col titulo-container">
+            <h1 class="titulo">{{ existeConfiguracion ? 'Iniciar sesión' : 'Registrar usuario' }}</h1>
+          </div>
 
-        <mat-card-content>
+          <mat-card-content>
 
-          <!-- Campos adicionales solo para el registro -->
-          <div *ngIf="!existeConfiguracion">
-            <div class="row">
+            <!-- Campos adicionales solo para el registro -->
+            <div *ngIf="!existeConfiguracion">
+              <div class="row">
+                <div class="col">
+                  <mat-form-field appearance="outline" class="w-100">
+                    <mat-label>Nombre</mat-label>
+                    <input type="text" matInput [formControl]="txNombre"/>
+                  </mat-form-field>
+                  <app-error-messages [control]="txNombre"></app-error-messages>
+                </div>
+                <div class="col">
+                  <mat-form-field appearance="outline" class="w-100">
+                    <mat-label>Apellido</mat-label>
+                    <input type="text" matInput [formControl]="txApellido"/>
+                  </mat-form-field>
+                  <app-error-messages [control]="txApellido"></app-error-messages>
+                </div>
+              </div>
+            </div>
+
+            <!-- Fila de Nombre de usuario, Contraseña y Confirmación de Contraseña usando Flexbox -->
+            <div class="row d-flex">
               <div class="col">
                 <mat-form-field appearance="outline" class="w-100">
-                  <mat-label>Nombre</mat-label>
-                  <input type="text" matInput [formControl]="txNombre"/>
+                  <mat-label>Nombre de usuario</mat-label>
+                  <input type="text" matInput [formControl]="txNombreUsuario"/>
                 </mat-form-field>
-                <app-error-messages [control]="txNombre"></app-error-messages>
+                <app-error-messages [control]="txNombreUsuario"></app-error-messages>
               </div>
+
+              <div class="col" *ngIf="!existeConfiguracion">
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Email</mat-label>
+                  <input type="email" matInput [formControl]="txMail"/>
+                </mat-form-field>
+                <app-error-messages [control]="txMail"></app-error-messages>
+              </div>
+            </div>
+
+            <div class="row d-flex">
               <div class="col">
                 <mat-form-field appearance="outline" class="w-100">
-                  <mat-label>Apellido</mat-label>
-                  <input type="text" matInput [formControl]="txApellido"/>
+                  <mat-label>Contraseña</mat-label>
+                  <input [type]="hidePassword ? 'password' : 'text'" matInput [formControl]="txContrasena"/>
+                  <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button">
+                    <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+                  </button>
                 </mat-form-field>
-                <app-error-messages [control]="txApellido"></app-error-messages>
+                <app-error-messages [control]="txContrasena"></app-error-messages>
+              </div>
+
+              <div *ngIf="existeConfiguracion">
+                <p class="olvidaste-text" (click)="cambiarContrasena()">¿Olvidaste tu contraseña?</p>
+              </div>
+
+              <div *ngIf="!existeConfiguracion" class="col">
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Confirmar Contraseña</mat-label>
+                  <input [type]="hideConfirmPassword ? 'password' : 'text'" matInput [formControl]="txConfirmarContrasena"/>
+                  <button mat-icon-button matSuffix (click)="hideConfirmPassword = !hideConfirmPassword" type="button">
+                    <mat-icon>{{ hideConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+                  </button>
+                </mat-form-field>
+                <app-error-messages [control]="txConfirmarContrasena"></app-error-messages>
               </div>
             </div>
-          </div>
 
-          <!-- Fila de Nombre de usuario, Contraseña y Confirmación de Contraseña usando Flexbox -->
-          <div class="row d-flex">
-            <div class="col">
-              <mat-form-field appearance="outline" class="w-100">
-                <mat-label>Nombre de usuario</mat-label>
-                <input type="text" matInput [formControl]="txNombreUsuario"/>
-              </mat-form-field>
-              <app-error-messages [control]="txNombreUsuario"></app-error-messages>
-            </div>
-
-            <div class="col" *ngIf="!existeConfiguracion">
-              <mat-form-field appearance="outline" class="w-100">
-                <mat-label>Email</mat-label>
-                <input type="email" matInput [formControl]="txMail"/>
-              </mat-form-field>
-              <app-error-messages [control]="txMail"></app-error-messages>
-            </div>
-          </div>
-
-          <div class="row d-flex">
-            <div class="col">
-              <mat-form-field appearance="outline" class="w-100">
-                <mat-label>Contraseña</mat-label>
-                <input [type]="hidePassword ? 'password' : 'text'" matInput [formControl]="txContrasena"/>
-                <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button">
-                  <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+            <!-- Botones -->
+            <div class="row text-right mb-3">
+              <div class="col d-flex justify-content-end">
+                <button mat-raised-button class="btn round" color="accent" id="btnLoguearse"
+                        (click)="existeConfiguracion ? iniciarSesion() : registrarse()">
+                  {{ existeConfiguracion ? 'Continuar' : 'Registrarte' }}
                 </button>
-              </mat-form-field>
-              <app-error-messages [control]="txContrasena"></app-error-messages>
+              </div>
+
+              <!-- loading -->
+              <div class="spinner-wrapper" *ngIf="isValidatingPassword">
+                <mat-spinner></mat-spinner>
+              </div>
             </div>
 
-            <div *ngIf="existeConfiguracion">
-              <p class="olvidaste-text" (click)="cambiarContrasena()">¿Olvidaste tu contraseña?</p>
-            </div>
-
-            <div *ngIf="!existeConfiguracion" class="col">
-              <mat-form-field appearance="outline" class="w-100">
-                <mat-label>Confirmar Contraseña</mat-label>
-                <input [type]="hideConfirmPassword ? 'password' : 'text'" matInput [formControl]="txConfirmarContrasena"/>
-                <button mat-icon-button matSuffix (click)="hideConfirmPassword = !hideConfirmPassword" type="button">
-                  <mat-icon>{{ hideConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
-                </button>
-              </mat-form-field>
-              <app-error-messages [control]="txConfirmarContrasena"></app-error-messages>
-            </div>
-          </div>
-
-          <!-- Botones -->
-          <div class="row text-right mb-3">
-            <div class="col d-flex justify-content-end">
-              <button mat-raised-button class="btn round" color="accent" id="btnLoguearse"
-                      (click)="existeConfiguracion ? iniciarSesion() : registrarse()">
-                {{ existeConfiguracion ? 'Continuar' : 'Registrarte' }}
-              </button>
-            </div>
-
-            <!-- loading -->
-            <div class="spinner-wrapper" *ngIf="isValidatingPassword">
-              <mat-spinner></mat-spinner>
-            </div>
-          </div>
-
-        </mat-card-content>
-      </mat-card>
-    </form>
+          </mat-card-content>
+        </mat-card>
+      </form>
+    </div>
+  </div>
+  <div class="login-right">
+    <img src="/assets/imgs/img-login.png" alt="Login" class="login-image">
   </div>
 </div>
