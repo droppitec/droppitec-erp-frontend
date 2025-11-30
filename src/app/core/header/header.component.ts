@@ -14,7 +14,6 @@ export class HeaderComponent implements OnInit {
   @Output() toggleThemeEmmiter: EventEmitter<boolean> = new EventEmitter();
   public estaLogeado: boolean = false;
   public nombreApellido: string = '';
-  public logoUrl: string = '';
   public darkMode: boolean = false;
 
   constructor(
@@ -29,7 +28,6 @@ export class HeaderComponent implements OnInit {
     this.obtenerInformacionTema();
     this.authService.authenticationStatus$.subscribe(isAuthenticated => {
       if (isAuthenticated) {
-        this.obtenerLogo();
         this.toggleSideBarForMe.emit(true);
         this.estaLogeado = true;
         const token = this.authService.getToken();
@@ -60,13 +58,6 @@ export class HeaderComponent implements OnInit {
     this.themeService.toggleDarkMode();
     this.obtenerInformacionTema();
     this.toggleThemeEmmiter.emit(this.darkMode);
-  }
-
-  // Metodo que obtiene el logo para utilizar en el header desde la configuración
-  public obtenerLogo() {
-    this.configuracionesService.consultarConfiguraciones().subscribe((configuracion) => {
-       this.logoUrl = configuracion.logo; // De todas formas, el scss redimensiona a 35x43px
-    });
   }
 
   // Metodo para abrir el menu lateral
