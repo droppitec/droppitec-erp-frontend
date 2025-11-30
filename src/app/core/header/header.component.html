@@ -5,7 +5,7 @@
         <mat-icon>menu</mat-icon>
       </button>
       <a class="ml-2" href="/">
-        <img class="header-logo" [src]="logoUrl ? logoUrl : '../../../assets/imgs/logo-header.png'" alt="logo-caja"/>
+        <img class="header-logo" [src]="'../../../assets/imgs/logo-header.svg'" alt="logo-pikso"/>
       </a>
     </div>
     <div class="float-right mt-15" fxFlex fxLayout="row" fxLayoutAlign="flex-end">
@@ -18,10 +18,12 @@
             </span>
           </button>
           <mat-menu #menu="matMenu" [class.dark-mode]="darkMode" >
+            <!--
             <button mat-menu-item (click)="toggleTheme()">
               <mat-icon>{{ darkMode ? 'wb_sunny' : 'brightness_3' }}</mat-icon>
               {{ darkMode ? 'Modo claro' : 'Modo oscuro' }}
             </button>
+            -->
             <button mat-menu-item (click)="exit()">
               <mat-icon>exit_to_app</mat-icon>
               Salir

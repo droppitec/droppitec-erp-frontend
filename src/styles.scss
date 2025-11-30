@@ -2,97 +2,107 @@
 
 
 :root {
-  --naranja-primario: #e15b35;
-  --header-bg: #f5f5f5;
+  --azul-primario: #2563eb;
+  --azul-hover: #1d4ed8;
+  --azul-claro: #3b82f6;
+  --negro-texto: #000000;
+  --gris-texto: #4b5563;
+  --gris-claro: #9ca3af;
+  --header-bg: #ffffff;
   --header-color: #000000;
   --menu-bg: #ffffff;
-  --menu-item-hover-bg: #efefef;
+  --menu-item-hover-bg: #f3f4f6;
   --menu-item-color: #000000;
-  --border-color-nav: #ddd;
-  --bg-drawer: #fdfdfd;
-  --bg-card: #fffff;
-  --color-border-card: #fffff;
-  --color-text-title: grey;
-  --color-title-item-card: #494949;
-  --bg-hover-items-home: #f8f8f8;
-  --mat-divider-color: #ddd;
-  --button-hover: #e15b35;
+  --border-color-nav: #e5e7eb;
+  --bg-drawer: #ffffff;
+  --bg-card: #ffffff;
+  --color-border-card: #ffffff;
+  --color-text-title: #374151;
+  --color-title-item-card: #1f2937;
+  --bg-hover-items-home: #f9fafb;
+  --mat-divider-color: #e5e7eb;
+  --button-hover: #1d4ed8;
   --boder-mat-card-calido: 0px;
-  --color-input-text-box: #131313;
-  --bg-seccion-generar-reporte: #fefefe;
-  --title-generar-reporte: #333;
-  --bg-hover-generar-reporte: #f1f0f0;
-  --mat-table-row-item-outline-color: #ddd;
+  --color-input-text-box: #111827;
+  --bg-seccion-generar-reporte: #ffffff;
+  --title-generar-reporte: #1f2937;
+  --bg-hover-generar-reporte: #f3f4f6;
+  --mat-table-row-item-outline-color: #e5e7eb;
   --mdc-outlined-text-field-outline-color: rgba(0, 0, 0, .38);
   --mdc-outlined-text-field-disabled-outline-color: rgba(0, 0, 0, .06);
   --mdc-outlined-text-field-disabled-label-text-color: rgba(0, 0, 0, 0.38);
   --mdc-outlined-text-field-disabled-input-text-color: rgba(0, 0, 0, 0.38);
   --mdc-outlined-text-field-hover-outline-color: rgba(0, 0, 0, .6);
-  --mdc-outlined-text-field-focus-outline-color: #3f51b4;
-  --mdc-outlined-text-field-focus-label-text-color: #3f51b4;
+  --mdc-outlined-text-field-focus-outline-color: #2563eb;
+  --mdc-outlined-text-field-focus-label-text-color: #2563eb;
   --mdc-outlined-text-field-label-text-color: rgba(0, 0, 0, .6);
   --mdc-outlined-text-field-hover-label-text-color: rgba(0, 0, 0, .6);
-  --btn-border-registrar: 1px solid #e15b35;
+  --btn-border-registrar: 1px solid #2563eb;
   --btn-radius-registrar: 5px;
   --mdc-outlined-button-outline-color: #ffffff;
   --mdc-outlined-button-outline-width: 0px;
-  --border-productos-venta: 1px solid #ddd;
-  --bs-secondary-bg: #fdfdfd;
-  --detalle-arqueo: #555;
+  --border-productos-venta: 1px solid #e5e7eb;
+  --bs-secondary-bg: #ffffff;
+  --detalle-arqueo: #4b5563;
   --text-muted-custom: rgba(33, 37, 41, .75);
   --product-name-detalle-venta: #000000;
-  --bg-venta-anulada: #f2f2f2;
+  --bg-venta-anulada: #f3f4f6;
   --mat-select-disabled-text-color: rgba(0, 0, 0, 0.38);
-  --diferencia-title-color: #333;
-  --bg-summary-venta: #f8fafc;
+  --diferencia-title-color: #1f2937;
+  --bg-summary-venta: #f9fafb;
   --mdc-form-field-label-text-color: rgba(0, 0, 0, 0.87);
 }
 
 .dark-mode {
-  --naranja-primario: #e15b35;
-  --header-bg: #2A2A3B;
-  --header-color: #EDEDED;
-  --menu-bg: #3E3E4E;
-  --menu-item-hover-bg: #5A5A6E;
-  --menu-item-color: #EDEDED;
-  --border-color-nav: #414141;
-  --bg-drawer: #161621;
-  --bg-card: #2A2A3B;
-  --color-border-card: #3E3E4E;
-  --color-text-title: #EDEDED;
-  --color-title-item-card: #aeaeae;
-  --bg-hover-items-home: #2e2e3c;
-  --mat-divider-color: #414141;
-  --button-hover: #e15b35;
-  --boder-mat-card-calido: 1px solid #414141;
-  --color-input-text-box: #EDEDED;
-  --bg-seccion-generar-reporte: #2a2a3b;
-  --title-generar-reporte: #EDEDED;
-  --bg-hover-generar-reporte: #2e2e42;
-  --mat-table-row-item-outline-color: #3E3E4E;
-  --mdc-outlined-text-field-outline-color: #EDEDED;
-  --mdc-outlined-text-field-disabled-outline-color: #363642;
-  --mdc-outlined-text-field-disabled-label-text-color: rgba(53, 53, 63, 0.98);
-  --mdc-outlined-text-field-disabled-input-text-color: rgba(255, 255, 255, 0.38);
-  --mdc-outlined-text-field-hover-outline-color: #fafafa;
-  --mdc-outlined-text-field-focus-outline-color: #3f51b4;
-  --mdc-outlined-text-field-focus-label-text-color: #3f51b4;
-  --mdc-outlined-text-field-label-text-color: #EDEDED;
-  --mdc-outlined-text-field-hover-label-text-color: #8c8c8c;
-  --btn-border-registrar: 1px solid #e15b35;
+  --azul-primario: #3b82f6;
+  --azul-hover: #2563eb;
+  --azul-claro: #60a5fa;
+  --negro-texto: #ffffff;
+  --gris-texto: #d1d5db;
+  --gris-claro: #9ca3af;
+  --header-bg: #ffffff;
+  --header-color: #000000;
+  --menu-bg: #ffffff;
+  --menu-item-hover-bg: #f3f4f6;
+  --menu-item-color: #000000;
+  --border-color-nav: #e5e7eb;
+  --bg-drawer: #ffffff;
+  --bg-card: #ffffff;
+  --color-border-card: #ffffff;
+  --color-text-title: #374151;
+  --color-title-item-card: #1f2937;
+  --bg-hover-items-home: #f9fafb;
+  --mat-divider-color: #e5e7eb;
+  --button-hover: #1d4ed8;
+  --boder-mat-card-calido: 0px;
+  --color-input-text-box: #111827;
+  --bg-seccion-generar-reporte: #ffffff;
+  --title-generar-reporte: #1f2937;
+  --bg-hover-generar-reporte: #f3f4f6;
+  --mat-table-row-item-outline-color: #e5e7eb;
+  --mdc-outlined-text-field-outline-color: rgba(0, 0, 0, .38);
+  --mdc-outlined-text-field-disabled-outline-color: rgba(0, 0, 0, .06);
+  --mdc-outlined-text-field-disabled-label-text-color: rgba(0, 0, 0, 0.38);
+  --mdc-outlined-text-field-disabled-input-text-color: rgba(0, 0, 0, 0.38);
+  --mdc-outlined-text-field-hover-outline-color: rgba(0, 0, 0, .6);
+  --mdc-outlined-text-field-focus-outline-color: #2563eb;
+  --mdc-outlined-text-field-focus-label-text-color: #2563eb;
+  --mdc-outlined-text-field-label-text-color: rgba(0, 0, 0, .6);
+  --mdc-outlined-text-field-hover-label-text-color: rgba(0, 0, 0, .6);
+  --btn-border-registrar: 1px solid #2563eb;
   --btn-radius-registrar: 5px;
-  --mdc-outlined-button-outline-color: #2A2A3B;
+  --mdc-outlined-button-outline-color: #ffffff;
   --mdc-outlined-button-outline-width: 0px;
-  --border-productos-venta: 1px solid #3E3E4E;
-  --bs-secondary-bg: #2A2A3B;
-  --detalle-arqueo: #bebebe;
-  --text-muted-custom: grey;
-  --product-name-detalle-venta: #EDEDED;
-  --bg-venta-anulada: #2e2e42;
-  --mat-select-disabled-text-color: rgba(255, 255, 255, 0.38);
-  --diferencia-title-color: #EDEDED;
-  --bg-summary-venta: #3E3E4E;
-  --mdc-form-field-label-text-color: #EDEDED;
+  --border-productos-venta: 1px solid #e5e7eb;
+  --bs-secondary-bg: #ffffff;
+  --detalle-arqueo: #4b5563;
+  --text-muted-custom: rgba(33, 37, 41, .75);
+  --product-name-detalle-venta: #000000;
+  --bg-venta-anulada: #f3f4f6;
+  --mat-select-disabled-text-color: rgba(0, 0, 0, 0.38);
+  --diferencia-title-color: #1f2937;
+  --bg-summary-venta: #f9fafb;
+  --mdc-form-field-label-text-color: rgba(0, 0, 0, 0.87);
 }
 
 .mdc-text-field--outlined.mdc-text-field--disabled .mdc-text-field__input {
@@ -128,8 +138,8 @@ body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
   overflow-y: hidden;
-  background-color: var(--background-color);
-  color: var(--text-color);
+  background-color: #ffffff;
+  color: #000000;
 }
 
 mat-card {
@@ -180,9 +190,14 @@ svg {
   border-radius: var(--btn-radius-registrar) !important;
 }
 
+.mat-mdc-outlined-button.mat-primary:hover {
+  background-color: var(--azul-primario) !important;
+  color: white !important;
+}
+
 .titulo {
   font-weight: 500;
-  color: #e15b35;
+  color: #2563eb;
   font-size: 26px;
 }
 
@@ -210,8 +225,8 @@ svg {
 
 .notify-loading {
   --mat-mdc-snack-bar-button-color: #535715;
-  --mdc-snackbar-container-color: #fde4dc;
-  --mdc-snackbar-supporting-text-color: #e15b35;
+  --mdc-snackbar-container-color: #dbeafe;
+  --mdc-snackbar-supporting-text-color: #2563eb;
   --mat-snack-bar-button-color: #a88c26;
   --mdc-snackbar-supporting-text-weight: 800;
 }
@@ -220,8 +235,8 @@ svg {
   position: relative;
   z-index: 1001;
   --mat-mdc-snack-bar-button-color: #535715;
-  --mdc-snackbar-container-color: #fde4dc;
-  --mdc-snackbar-supporting-text-color: #e15b35;
+  --mdc-snackbar-container-color: #dbeafe;
+  --mdc-snackbar-supporting-text-color: #2563eb;
   --mat-snack-bar-button-color: #a88c26;
   --mdc-snackbar-supporting-text-weight: 800;
 }
@@ -235,12 +250,12 @@ svg {
 }
 
 #btnLimpiarFiltro {
-  color: #e15b35;
+  color: #2563eb;
   margin-right: 1rem;
 }
 
 #btnBuscar, #btnBuscar2 {
-  background-color: #e15b35;
+  background-color: #2563eb;
   color: white;
 }
 
@@ -280,7 +295,7 @@ svg {
 }
 
 .mat-mdc-progress-spinner {
-  --mdc-circular-progress-active-indicator-color: #f18451;
+  --mdc-circular-progress-active-indicator-color: #2563eb;
 }
 
 .spinner-wrapper {
@@ -295,7 +310,7 @@ svg {
 }
 
 .mdc-text-field--outlined:not(.mdc-text-field--disabled).mdc-floating-label {
-  color: #f59f8a !important;
+  color: #2563eb !important;
 }
 
 .custom-dialog-container {

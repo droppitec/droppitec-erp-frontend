@@ -118,23 +118,6 @@
       </div>
 
       <br>
-      <h4 style="color: grey">Diseño de la interfaz de usuario</h4>
-
-      <!-- Logo -->
-      <div class="row pt-4">
-        <div class="col-md-6">
-          <div class="upload-container d-flex align-items-center mb-3"
-               (dragover)="onDragOver($event)"
-               (drop)="onDrop($event)"
-          >
-            <img *ngIf="logoUrl" [src]="logoUrl" class="preview-img">
-            <span *ngIf="!logoUrl" class="upload-text">Arrastra aquí...</span>
-            <input type="file" class="file-input" (change)="onFileSelected($event)">
-          </div>
-        </div>
-      </div>
-
-      <br>
 
       <h4 style="color: grey">Ventas</h4>
       <div class="row pt-4">
@@ -193,7 +176,7 @@
     <!-- Btn Guardar -->
     <div class="row text-right">
       <div class="col d-flex justify-content-end">
-        <button mat-stroked-button color="warn" class="btn round" (click)="guardarConfiguracion()">Guardar</button>
+        <button mat-stroked-button color="primary" class="btn round" (click)="guardarConfiguracion()">Guardar</button>
       </div>
     </div>
 

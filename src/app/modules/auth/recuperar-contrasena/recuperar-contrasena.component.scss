@@ -1,5 +1,48 @@
+.recover-container {
+  display: flex;
+  height: calc(100vh - 64px);
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.recover-left {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background-image: url('/assets/imgs/login-background.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.form-wrapper {
+  width: 100%;
+  max-width: 500px;
+}
+
+.recover-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f5f5f5;
+  overflow: hidden;
+}
+
+.recover-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .mat-card {
-  min-width: 300px; /* Establece el ancho mínimo de la tarjeta */
+  min-width: 300px;
   width: 100%;
   max-width: 500px;
   overflow-x: auto;
@@ -15,16 +58,16 @@
 }
 
 #btnLoguearse {
-  background-color: #ef7c5e;
+  background-color: #3b82f6;
   color: white;
 }
 
 #btnLoguearse:hover {
-  background-color: #e15b35;
+  background-color: #2563eb;
 }
 
 #btnRegistrarse {
-  color: #e15b35;
+  color: #2563eb;
 }
 
 .volver-text {
@@ -36,5 +79,19 @@
 }
 
 .volver-text:hover {
-  text-decoration: underline; /* Subraya solo cuando el mouse está encima */
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .recover-container {
+    flex-direction: column;
+  }
+
+  .recover-right {
+    display: none;
+  }
+
+  .recover-left {
+    width: 100%;
+  }
 }

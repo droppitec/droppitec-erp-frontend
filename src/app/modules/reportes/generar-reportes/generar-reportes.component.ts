@@ -161,8 +161,8 @@ export class GenerarReportesComponent implements OnInit {
           {
             label: 'Cantidad',
             data: data,
-            backgroundColor: 'rgba(246,121,86,0.8)',
-            borderColor: 'rgba(225, 91, 53, 1)',
+            backgroundColor: 'rgba(59, 130, 246, 0.8)',
+            borderColor: 'rgba(37, 99, 235, 1)',
             borderWidth: 1,
           },
         ],

@@ -13,6 +13,12 @@ import {VentasDiariaComando} from "../models/comandos/dashboard/VentasDiaria.com
 import {DetalleVenta} from "../models/detalleVenta.model";
 import {FiltrosDetallesVenta} from "../models/comandos/FiltrosDetallesVenta.comando";
 import {MovimientoCuentaCorriente} from "../models/movimientoCuentaCorriente";
+import {FiltrosEstadisticasVentas} from "../models/comandos/FiltrosEstadisticasVentas.comando";
+import {VentasPorFormaPago} from "../models/comandos/dashboard/VentasPorFormaPago.comando";
+import {VentasPorCategoria} from "../models/comandos/dashboard/VentasPorCategoria.comando";
+import {VentasPorHora} from "../models/comandos/dashboard/VentasPorHora.comando";
+import {VentasPorEmpleado} from "../models/comandos/dashboard/VentasPorEmpleado.comando";
+import {VentasPorCliente} from "../models/comandos/dashboard/VentasPorCliente.comando";
 
 
 @Injectable({
@@ -92,5 +98,26 @@ export class VentasService {
 
   public pagarConSIROQRPagosDeCuentaCorriente(movimiento: MovimientoCuentaCorriente): Observable<SpResult>{
     return this.http.post<SpResult>(`${this.urlBackend}/${this.controllerName}/generar-pago-cuenta-corriente`, movimiento);
+  }
+
+  // Métodos para estadísticas de ventas
+  public obtenerVentasPorFormaPago(filtros: FiltrosEstadisticasVentas): Observable<VentasPorFormaPago[]>{
+    return this.http.post<VentasPorFormaPago[]>(`${this.urlBackend}/${this.controllerName}/obtener-ventas-por-forma-pago`, filtros);
+  }
+
+  public obtenerVentasPorCategoria(filtros: FiltrosEstadisticasVentas): Observable<VentasPorCategoria[]>{
+    return this.http.post<VentasPorCategoria[]>(`${this.urlBackend}/${this.controllerName}/obtener-ventas-por-categoria`, filtros);
+  }
+
+  public obtenerVentasPorHora(filtros: FiltrosEstadisticasVentas): Observable<VentasPorHora[]>{
+    return this.http.post<VentasPorHora[]>(`${this.urlBackend}/${this.controllerName}/obtener-ventas-por-hora`, filtros);
+  }
+
+  public obtenerVentasPorEmpleado(filtros: FiltrosEstadisticasVentas): Observable<VentasPorEmpleado[]>{
+    return this.http.post<VentasPorEmpleado[]>(`${this.urlBackend}/${this.controllerName}/obtener-ventas-por-empleado`, filtros);
+  }
+
+  public obtenerVentasPorCliente(filtros: FiltrosEstadisticasVentas): Observable<VentasPorCliente[]>{
+    return this.http.post<VentasPorCliente[]>(`${this.urlBackend}/${this.controllerName}/obtener-ventas-por-cliente`, filtros);
   }
 }

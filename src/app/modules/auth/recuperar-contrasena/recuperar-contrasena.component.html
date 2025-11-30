@@ -1,72 +1,77 @@
-<div class="row justify-content-center mt-5">
-  <div class="col-8">
-    <form [formGroup]="formRecuperar">
+<div class="recover-container">
+  <div class="recover-left">
+    <div class="form-wrapper">
+      <form [formGroup]="formRecuperar">
 
-      <mat-card class="mat-card">
+        <mat-card class="mat-card">
 
-        <div class="col titulo-container">
-          <h1 class="titulo">{{ 'Recuperar contraseña' }}</h1>
-        </div>
+          <div class="col titulo-container">
+            <h1 class="titulo">{{ 'Recuperar contraseña' }}</h1>
+          </div>
 
-        <mat-card-content>
+          <mat-card-content>
 
-          <!-- Campos para recuperar -->
-          <div>
-            <div class="row" *ngIf="!existeToken">
-              <div class="col">
-                <mat-form-field appearance="outline" class="w-100">
-                  <mat-label>Email</mat-label>
-                  <input type="text" matInput [formControl]="txCorreo"/>
-                </mat-form-field>
-                <app-error-messages [control]="txCorreo"></app-error-messages>
+            <!-- Campos para recuperar -->
+            <div>
+              <div class="row" *ngIf="!existeToken">
+                <div class="col">
+                  <mat-form-field appearance="outline" class="w-100">
+                    <mat-label>Email</mat-label>
+                    <input type="text" matInput [formControl]="txCorreo"/>
+                  </mat-form-field>
+                  <app-error-messages [control]="txCorreo"></app-error-messages>
+                </div>
+              </div>
+
+              <div class="row d-flex" *ngIf="existeToken">
+                <div class="col">
+                  <mat-form-field appearance="outline" class="w-100">
+                    <mat-label>Contraseña</mat-label>
+                    <input [type]="hidePassword ? 'password' : 'text'" matInput [formControl]="txContrasena"/>
+                    <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button">
+                      <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+                    </button>
+                  </mat-form-field>
+                  <app-error-messages [control]="txContrasena"></app-error-messages>
+                </div>
+
+                <div *ngIf="existeToken" class="col">
+                  <mat-form-field appearance="outline" class="w-100">
+                    <mat-label>Confirmar Contraseña</mat-label>
+                    <input [type]="hideConfirmPassword ? 'password' : 'text'" matInput [formControl]="txConfirmarContrasena"/>
+                    <button mat-icon-button matSuffix (click)="hideConfirmPassword = !hideConfirmPassword" type="button">
+                      <mat-icon>{{ hideConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+                    </button>
+                  </mat-form-field>
+                  <app-error-messages [control]="txConfirmarContrasena"></app-error-messages>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Botones -->
+            <div class="row text-right mb-3">
+              <div class="col d-flex justify-content-end">
+                <button mat-raised-button class="btn round" color="accent" id="btnLoguearse"
+                        (click)="existeToken ? cambiarContrasena() : enviarEnlace()">{{ existeToken ? 'Cambiar contraseña' : 'Enviar enlace de inicio de sesión' }}
+                </button>
               </div>
             </div>
 
-            <div class="row d-flex" *ngIf="existeToken">
-              <div class="col">
-                <mat-form-field appearance="outline" class="w-100">
-                  <mat-label>Contraseña</mat-label>
-                  <input [type]="hidePassword ? 'password' : 'text'" matInput [formControl]="txContrasena"/>
-                  <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button">
-                    <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
-                  </button>
-                </mat-form-field>
-                <app-error-messages [control]="txContrasena"></app-error-messages>
-              </div>
+            <br>
+            <mat-divider></mat-divider>
+            <br>
 
-              <div *ngIf="existeToken" class="col">
-                <mat-form-field appearance="outline" class="w-100">
-                  <mat-label>Confirmar Contraseña</mat-label>
-                  <input [type]="hideConfirmPassword ? 'password' : 'text'" matInput [formControl]="txConfirmarContrasena"/>
-                  <button mat-icon-button matSuffix (click)="hideConfirmPassword = !hideConfirmPassword" type="button">
-                    <mat-icon>{{ hideConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
-                  </button>
-                </mat-form-field>
-                <app-error-messages [control]="txConfirmarContrasena"></app-error-messages>
-              </div>
+            <div>
+              <p class="volver-text" (click)="volver()">Volver</p>
             </div>
 
-          </div>
-
-          <!-- Botones -->
-          <div class="row text-right mb-3">
-            <div class="col d-flex justify-content-end">
-              <button mat-raised-button class="btn round" color="accent" id="btnLoguearse"
-                      (click)="existeToken ? cambiarContrasena() : enviarEnlace()">{{ existeToken ? 'Cambiar contraseña' : 'Enviar enlace de inicio de sesión' }}
-              </button>
-            </div>
-          </div>
-
-          <br>
-          <mat-divider></mat-divider>
-          <br>
-
-          <div>
-            <p class="volver-text" (click)="volver()">Volver</p>
-          </div>
-
-        </mat-card-content>
-      </mat-card>
-    </form>
+          </mat-card-content>
+        </mat-card>
+      </form>
+    </div>
+  </div>
+  <div class="recover-right">
+    <img src="/assets/imgs/img-login.png" alt="Recuperar contraseña" class="recover-image">
   </div>
 </div>
