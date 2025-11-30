@@ -190,6 +190,11 @@ svg {
   border-radius: var(--btn-radius-registrar) !important;
 }
 
+.mat-mdc-outlined-button.mat-primary:hover {
+  background-color: var(--azul-primario) !important;
+  color: white !important;
+}
+
 .titulo {
   font-weight: 500;
   color: #2563eb;
